@@ -15,7 +15,8 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var songProgressView: UIProgressView!
     @IBOutlet weak var currentlyPlayingToolbar: UIToolbar!
-    @IBOutlet weak var playButton: UIBarButtonItem!
+    
+    //@IBOutlet weak var playButton: UIBarButtonItem!
     
     var rc           = RealmControl()
     var selectedCell = 0
@@ -35,6 +36,14 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        
+        notificationCenter.addObserver(self, selector: "setPlayButtonState", name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: self.musicPlayer)
+        
+        musicPlayer.beginGeneratingPlaybackNotifications()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -62,6 +71,13 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
         disabledSongs = disabledSongs.sort({ $0.title < $1.title })
         
         setPlayButtonState()
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        musicPlayer.endGeneratingPlaybackNotifications()
+        
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: self.musicPlayer)
     }
 
     override func didReceiveMemoryWarning() {
@@ -199,20 +215,16 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
     }
     // TODO: NEXT MUST PUT OBSERVER ON MUSICPLAYER
     func setPlayButtonState() {
+        let tempButton : UIBarButtonItem!
         if musicPlayer.playbackState != MPMusicPlaybackState.Playing {
-            //playButton.titleLabel?.text = "Play"
-            let tempButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Play, target: self, action: "playButtonTapped:")
-            currentlyPlayingToolbar.setItems([tempButton], animated: false)
-            //playButton.setTitle("Play", forState: UIControlState.Normal)
+            tempButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Play, target: self, action: "playButtonTapped:")
             if musicPlayer.nowPlayingItem == nil {
-                playButton.enabled = false
+                tempButton.enabled = false
             }
         } else {
-            let tempButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Pause, target: self, action: "playButtonTapped:")
-            currentlyPlayingToolbar.setItems([tempButton], animated: false)
-            //playButton.titleLabel?.text = "Pause"
-            //playButton.setTitle("Pause", forState: UIControlState.Normal)
+            tempButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Pause, target: self, action: "playButtonTapped:")
         }
+        currentlyPlayingToolbar.setItems([tempButton!], animated: false)
     }
 
     /*
