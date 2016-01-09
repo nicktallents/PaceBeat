@@ -15,8 +15,8 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var songProgressView: UIProgressView!
     @IBOutlet weak var currentlyPlayingToolbar: UIToolbar!
-    
-    //@IBOutlet weak var playButton: UIBarButtonItem!
+    @IBOutlet weak var nowPlayingTitleLabel: UILabel!
+    @IBOutlet weak var nowPlayingInfoLabel: UILabel!
     
     var rc           = RealmControl()
     var selectedCell = 0
@@ -42,6 +42,8 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
         let notificationCenter = NSNotificationCenter.defaultCenter()
         
         notificationCenter.addObserver(self, selector: "setPlayButtonState", name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: self.musicPlayer)
+        
+        notificationCenter.addObserver(self, selector: "setNowPlayingLabels", name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: self.musicPlayer)
         
         musicPlayer.beginGeneratingPlaybackNotifications()
     }
@@ -71,12 +73,14 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
         disabledSongs = disabledSongs.sort({ $0.title < $1.title })
         
         setPlayButtonState()
+        setNowPlayingLabels()
     }
     
     override func viewWillDisappear(animated: Bool) {
         musicPlayer.endGeneratingPlaybackNotifications()
         
         let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.removeObserver(self, name: MPMusicPlayerControllerPlaybackStateDidChangeNotification, object: self.musicPlayer)
         notificationCenter.removeObserver(self, name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: self.musicPlayer)
     }
 
@@ -213,7 +217,7 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
     func navigateToManualBpmSet(action: UIAlertAction) {
         
     }
-    // TODO: NEXT MUST PUT OBSERVER ON MUSICPLAYER
+    
     func setPlayButtonState() {
         let tempButton : UIBarButtonItem!
         if musicPlayer.playbackState != MPMusicPlaybackState.Playing {
@@ -225,6 +229,29 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
             tempButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Pause, target: self, action: "playButtonTapped:")
         }
         currentlyPlayingToolbar.setItems([tempButton!], animated: false)
+    }
+    
+    func setNowPlayingLabels() {
+        if musicPlayer.nowPlayingItem != nil {
+            nowPlayingTitleLabel.text = musicPlayer.nowPlayingItem!.title
+            
+            if let artist = musicPlayer.nowPlayingItem?.artist {
+                nowPlayingInfoLabel.text = artist
+            } else {
+                nowPlayingInfoLabel.text = "Unknown Artist"
+            }
+            
+            nowPlayingInfoLabel.text! += " - "
+            
+            if let album = musicPlayer.nowPlayingItem?.albumTitle {
+                nowPlayingInfoLabel.text! += album
+            } else {
+                nowPlayingInfoLabel.text! += "Unknown Album"
+            }
+        } else {
+            nowPlayingTitleLabel.text = ""
+            nowPlayingInfoLabel.text = ""
+        }
     }
 
     /*

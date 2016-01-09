@@ -220,6 +220,8 @@
                     <connections>
                         <outlet property="CategorySegmentedControl" destination="uD1-lw-Q7f" id="XET-jR-wRe"/>
                         <outlet property="currentlyPlayingToolbar" destination="mgK-lB-q9m" id="99H-Hm-3qE"/>
+                        <outlet property="nowPlayingInfoLabel" destination="t3n-R3-9am" id="You-Ze-zKK"/>
+                        <outlet property="nowPlayingTitleLabel" destination="kCU-Ik-0eq" id="WHn-8k-NZm"/>
                         <outlet property="songProgressView" destination="7wr-hD-ZE1" id="Pv9-vy-6po"/>
                         <outlet property="tableView" destination="i04-2d-WDN" id="0GB-lc-q5Z"/>
                     </connections>
