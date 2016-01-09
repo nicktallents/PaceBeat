@@ -14,7 +14,8 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
     @IBOutlet weak var CategorySegmentedControl: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var songProgressView: UIProgressView!
-    @IBOutlet weak var playButton: UIButton!
+    @IBOutlet weak var currentlyPlayingToolbar: UIToolbar!
+    @IBOutlet weak var playButton: UIBarButtonItem!
     
     var rc           = RealmControl()
     var selectedCell = 0
@@ -200,13 +201,17 @@ class LibraryTableViewController: UIViewController, UITableViewDataSource, UITab
     func setPlayButtonState() {
         if musicPlayer.playbackState != MPMusicPlaybackState.Playing {
             //playButton.titleLabel?.text = "Play"
-            playButton.setTitle("Play", forState: UIControlState.Normal)
+            let tempButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Play, target: self, action: "playButtonTapped:")
+            currentlyPlayingToolbar.setItems([tempButton], animated: false)
+            //playButton.setTitle("Play", forState: UIControlState.Normal)
             if musicPlayer.nowPlayingItem == nil {
                 playButton.enabled = false
             }
         } else {
+            let tempButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Pause, target: self, action: "playButtonTapped:")
+            currentlyPlayingToolbar.setItems([tempButton], animated: false)
             //playButton.titleLabel?.text = "Pause"
-            playButton.setTitle("Pause", forState: UIControlState.Normal)
+            //playButton.setTitle("Pause", forState: UIControlState.Normal)
         }
     }
 
